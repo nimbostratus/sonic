@@ -24,6 +24,9 @@ SECRET_KEY = '&9ohy_$of=u!cmw81&=tvi9iy)prq-i^qd_$m_*ih$97_a_9=e'
 DEBUG = True
 
 TEMPLATE_DEBUG = True
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
 
 ALLOWED_HOSTS = []
 
@@ -37,7 +40,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'postmarkup',
+    'precise_bbcode',
+    'django_extensions',
     'community',
     'forum',
 )
@@ -62,8 +66,12 @@ WSGI_APPLICATION = 'sonic.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sonic',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': '',
     }
 }
 

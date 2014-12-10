@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
 from community.models import Member
@@ -6,6 +7,9 @@ from community.models import Member
 class Category(models.Model):
     name = models.CharField(_("category"), max_length=32)
     order = models.IntegerField(_('sort order'), default=0)
+
+    class Meta:
+        ordering = '-order',
 
     def __unicode__(self):
         return self.name
@@ -19,6 +23,9 @@ class Board(models.Model):
     name = models.CharField(_("category"), max_length=120)
     description  = models.CharField(_("category"), max_length=250)
 
+    def get_absolute_url(self):
+        return reverse('forum_board', kwargs={'id': self.id})
+
     def __unicode__(self):
         return self.name
 
@@ -26,6 +33,9 @@ class Board(models.Model):
 class Topic(models.Model):
     board = models.ForeignKey(Board)
     is_sticky = models.BooleanField(_('is sticky'), default=False)
+
+    def get_latest_post(self):
+        return self.post_set.latest('id')
 
 
 class Post(models.Model):
@@ -36,5 +46,5 @@ class Post(models.Model):
     modified_by = models.ForeignKey(Member, related_name="post_modified_set", blank=True, null=True)
     subject = models.CharField(_("category"), max_length=120)
     body = models.TextField(_('body'))
-    icon = models.CharField(_('icon'), max_length=2, blank=True, null=True)
+    icon = models.CharField(_('icon'), max_length=12, blank=True, null=True)
 

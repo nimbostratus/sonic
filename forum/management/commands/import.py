@@ -14,7 +14,7 @@ class Importer(object):
     SOURCE_PASSWORD = ''
 
     def _query(self, query):
-        connection = mdb.connect(self.SOURCE_HOST, self.SOURCE_USER, self.SOURCE_PASSWORD, self.SOURCE_DB)
+        connection = mdb.connect(self.SOURCE_HOST, self.SOURCE_USER, self.SOURCE_PASSWORD, self.SOURCE_DB, charset="utf8")
         cur = connection.cursor(DictCursor)
         cur.execute(query)
         rows = cur.fetchall()
@@ -93,7 +93,7 @@ class Importer(object):
                 created_at=datetime.datetime.fromtimestamp(row['posterTime']),
                 created_by=member,
                 subject=row['subject'],
-                body=row['body'],
+                body=row['body'].encode('utf-8'),
                 icon=row['icon'])
 
 class Command(BaseCommand):

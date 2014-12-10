@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1>Forum</h1>
+<table class="table">
+    {% for category in object_list %}
+    <thead>
+        <th>{{ category.name }}</th>
+        <th>{% trans "Topics" %}</th>
+        <th>{% trans "Posts" %}</th>
+    </thead>
+    <tbody>
+    {% for board in category.board_set.all %}
+    <tr>
+        <td>
+            <h4><a href="{{ board.get_absolute_url }}">{{ board.name }}</a></h4>
+            <span class="text-muted small">{{ board.description }}</span>
+        </td>
+        <td>{{ board.topic_set.count }}</td>
+        <td>{{ board.topic_set.message_set.count }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endfor %}
+</table>
+{% endblock %}

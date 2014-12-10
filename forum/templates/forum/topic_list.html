@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1><a href="{% url 'home' %}">Forum </a> > {{ board.name }}</h1>
+<span class="text-muted">{{ board.description }}</span>
+<table class="table">
+    {% for topic in object_list %}
+    <tr>
+        <td>
+            <h4><a href="">{{ topic.get_latest_post.subject }}</a></h4>
+        </td>
+        <td>{{ topic.post_set.count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
