@@ -2,6 +2,14 @@
 {% load bbcode_tags %}
 
 {% block content %}
+<h1>
+    <a href="{% url 'home' %}">Forum</a> >
+    {% if board.parent %}
+    <a href="{{ board.parent.get_absolute_url }}">{{ board.parent.name }}</a> >
+    {% endif %}
+    <a href="{{ board.get_absolute_url }}">{{ board.name }}</a> >
+    {{ topic.get_latest_post.subject }}
+</h1>
     <h2>{{ post.subject }}</h2>
     {% for post in object_list %}
     <hr/>
@@ -11,7 +19,7 @@
             <span class="text-muted">{{ post.created_at }}</span>
         </div>
         <div class="col-md-10">
-            {{ post.body }}
+            {{ post.body|bbcode|safe }}
         </div>
     </div>
     {% endfor %}

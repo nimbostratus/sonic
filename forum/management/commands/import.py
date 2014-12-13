@@ -1,11 +1,20 @@
+import datetime
+import HTMLParser
+
 from MySQLdb.cursors import DictCursor
 from django.core.management import BaseCommand
 import MySQLdb as mdb
-import datetime
+from django.db.models import DateTimeField
 
 from community.models import Member
 from forum.models import Category, Topic, Board, Post
 
+
+def disable_auto_now(model):
+    for field in model._meta.local_fields:
+        if isinstance(field, DateTimeField):
+            field.auto_now_add = False
+            field.auto_now = False
 
 class Importer(object):
     SOURCE_DB = "tlforum"
@@ -31,7 +40,7 @@ class Importer(object):
             else:
                 gender = 'm'
 
-            Member.objects.create(
+            member = Member(
                 id=row['ID_MEMBER'],
                 username=row["memberName"],
                 date_joined=datetime.datetime.fromtimestamp(row['dateRegistered']),
@@ -44,14 +53,18 @@ class Importer(object):
                 website=row['websiteUrl'],
                 location=row['location'],
                 icq=row['ICQ'])
+            disable_auto_now(member)
+            member.save()
 
     def import_categories(self):
         rows = self._query("select * from smf_categories")
         for row in rows:
-            Category.objects.create(
+            category = Category(
                 id=row['ID_CAT'],
                 name=row['name'],
                 order=row['catOrder'])
+            disable_auto_now(category)
+            category.save()
 
     def import_boards(self):
         rows = self._query("select * from smf_boards order by ID_PARENT")
@@ -61,25 +74,31 @@ class Importer(object):
                 parent = None
             else:
                 parent = Board.objects.get(id=row['ID_PARENT'])
-            Board.objects.create(
+            board = Board(
                 id=row['ID_BOARD'],
                 category=category,
                 parent=parent,
                 order=row['boardOrder'],
                 name=row['name'],
                 description=row['description'])
+            disable_auto_now(board)
+            board.save()
 
     def import_topics(self):
         rows = self._query("select * from smf_topics")
 
         for row in rows:
-            Topic.objects.create(
+            topic = Topic(
                 id=row['ID_TOPIC'],
                 is_sticky=row['isSticky'],
                 board=Board.objects.get(id=row['ID_BOARD']))
+            disable_auto_now(topic)
+            topic.save()
+
 
     def import_posts(self):
         rows = self._query("select * from smf_messages")
+        html_parser = HTMLParser.HTMLParser()
 
         for row in rows:
             if row['ID_MEMBER'] != 0:
@@ -87,14 +106,16 @@ class Importer(object):
             else:
                 member=None
 
-            Post.objects.create(
+            post = Post(
                 id=row['ID_MSG'],
                 topic=Topic.objects.get(id=row['ID_TOPIC']),
                 created_at=datetime.datetime.fromtimestamp(row['posterTime']),
                 created_by=member,
-                subject=row['subject'],
-                body=row['body'].encode('utf-8'),
+                subject=row['subject'].replace("Re:", ""),
+                body=html_parser.unescape(row['body']).replace("<br />", "\n"),
                 icon=row['icon'])
+            disable_auto_now(post)
+            post.save()
 
 class Command(BaseCommand):
     help = "Import legacy smf forum"

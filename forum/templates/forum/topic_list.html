@@ -2,16 +2,37 @@
 {% load i18n %}
 
 {% block content %}
-<h1><a href="{% url 'home' %}">Forum </a> > {{ board.name }}</h1>
-<span class="text-muted">{{ board.description }}</span>
+<h1>
+    <a href="{% url 'home' %}">Forum</a> >
+    {% if board.parent %}
+    <a href="{{ board.parent.get_absolute_url }}">{{ board.parent.name }}</a> >
+    {% endif %}
+    {{ board.name }}
+</h1>
+<span class="text-muted">{{ board.description }}</span><br/>
+{% for child in board.child_set.all %}
+<span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span> |
+{% endfor %}
+
 <table class="table">
-    {% for topic in object_list %}
-    <tr>
-        <td>
-            <h4><a href="">{{ topic.get_latest_post.subject }}</a></h4>
-        </td>
-        <td>{{ topic.post_set.count }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>{% trans "Topic" %}</th>
+            <th>{% trans "Posts" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for topic in object_list %}
+        {% with topic.get_latest_post as latest_post %}
+        <tr>
+            <td>
+                <h4><a href="{{ topic.get_absolute_url }}">{{ latest_post.subject }}</a></h4>
+                <span class="text-muted">{{ latest_post.created_at }}</span>
+            </td>
+            <td>{{ topic.post_set.count }}</td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

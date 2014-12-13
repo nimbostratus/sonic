@@ -15,13 +15,23 @@ class Category(models.Model):
         return self.name
 
 
+class BoardQuerySet(models.QuerySet):
+    def get_top_level(self):
+        return self.filter(parent__isnull=True)
+
+
 class Board(models.Model):
+    objects = BoardQuerySet.as_manager()
+
     category = models.ForeignKey(Category)
-    parent = models.ForeignKey('self', null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name="child_set")
     order = models.IntegerField(_('sort order'), default=0)
 
     name = models.CharField(_("category"), max_length=120)
     description  = models.CharField(_("category"), max_length=250)
+
+    class Meta:
+        ordering = '-order',
 
     def get_absolute_url(self):
         return reverse('forum_board', kwargs={'id': self.id})
@@ -34,8 +44,14 @@ class Topic(models.Model):
     board = models.ForeignKey(Board)
     is_sticky = models.BooleanField(_('is sticky'), default=False)
 
+    class Meta:
+        ordering = '-id',
+
     def get_latest_post(self):
         return self.post_set.latest('id')
+
+    def get_absolute_url(self):
+        return reverse('forum_topic', kwargs={'board_id': self.board.id, 'topic_id': self.id })
 
 
 class Post(models.Model):
@@ -48,3 +64,5 @@ class Post(models.Model):
     body = models.TextField(_('body'))
     icon = models.CharField(_('icon'), max_length=12, blank=True, null=True)
 
+    class Meta:
+        ordering = 'created_at',

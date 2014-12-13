@@ -11,11 +11,15 @@
         <th>{% trans "Posts" %}</th>
     </thead>
     <tbody>
-    {% for board in category.board_set.all %}
+    {% for board in category.board_set.get_top_level %}
     <tr>
         <td>
             <h4><a href="{{ board.get_absolute_url }}">{{ board.name }}</a></h4>
             <span class="text-muted small">{{ board.description }}</span>
+            <br/>
+            {% for child in board.child_set.all %}
+            <span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span> |
+            {% endfor %}
         </td>
         <td>{{ board.topic_set.count }}</td>
         <td>{{ board.topic_set.message_set.count }}</td>
