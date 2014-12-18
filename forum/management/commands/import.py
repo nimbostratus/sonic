@@ -8,6 +8,7 @@ from django.db.models import DateTimeField
 
 from community.models import Member
 from forum.models import Category, Topic, Board, Post
+from shoutbox.models import ShoutBox, Shout
 
 
 def disable_auto_now(model):
@@ -55,6 +56,34 @@ class Importer(object):
                 icq=row['ICQ'])
             disable_auto_now(member)
             member.save()
+
+    def import_shoutboxes(self):
+        rows = self._query("select * from smf_sp_shoutboxes")
+
+        for row in rows:
+            shoutbox = ShoutBox(
+                id=row['ID_SHOUTBOX'],
+                name=row['name'])
+            shoutbox.save()
+
+    def import_shouts(self):
+        html_parser = HTMLParser.HTMLParser()
+        rows = self._query("select * from smf_sp_shouts")
+
+        for row in rows:
+            try:
+                member = Member.objects.get(id=row['ID_MEMBER'])
+                shout = Shout(
+                    id=row['ID_SHOUT'],
+                    shoutbox=ShoutBox.objects.get(id=row['ID_SHOUTBOX']),
+                    created_by=member,
+                    created_at=datetime.datetime.fromtimestamp(row['log_time']),
+                    body=html_parser.unescape(row['body']).replace("<br />", "\n"))
+
+                disable_auto_now(shout)
+                shout.save()
+            except Member.DoesNotExist:
+                pass
 
     def import_categories(self):
         rows = self._query("select * from smf_categories")
@@ -122,6 +151,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         importer = Importer()
         importer.import_members()
+        importer.import_shoutboxes()
+        importer.import_shouts()
         importer.import_categories()
         importer.import_boards()
         importer.import_topics()

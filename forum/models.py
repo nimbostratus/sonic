@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import QuerySet, Count
 from django.utils.translation import ugettext as _
 from community.models import Member
 
@@ -40,7 +41,14 @@ class Board(models.Model):
         return self.name
 
 
+class TopicQuerySet(QuerySet):
+    def get_post_count(self):
+        return self.aggregate(Count('post'))['post__count']
+
+
 class Topic(models.Model):
+    objects = TopicQuerySet.as_manager()
+
     board = models.ForeignKey(Board)
     is_sticky = models.BooleanField(_('is sticky'), default=False)
 

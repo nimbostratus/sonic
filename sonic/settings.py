@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'community',
     'forum',
+    'shoutbox',
 )
 
 MIDDLEWARE_CLASSES = (

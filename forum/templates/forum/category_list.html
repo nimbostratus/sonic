@@ -14,15 +14,14 @@
     {% for board in category.board_set.get_top_level %}
     <tr>
         <td>
-            <h4><a href="{{ board.get_absolute_url }}">{{ board.name }}</a></h4>
-            <span class="text-muted small">{{ board.description }}</span>
-            <br/>
+            <h4 class="board-heading"><a href="{{ board.get_absolute_url }}">{{ board.name }}</a></h4>
+            <span class="text-muted small">{{ board.description }}</span><br/>
             {% for child in board.child_set.all %}
-            <span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span> |
+                <span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span>{{ forloop.last|yesno:',<span class="text-muted"> |</span>'|safe }}
             {% endfor %}
         </td>
         <td>{{ board.topic_set.count }}</td>
-        <td>{{ board.topic_set.message_set.count }}</td>
+        <td>{{ board.topic_set.get_post_count }}</td>
     </tr>
     {% endfor %}
     </tbody>

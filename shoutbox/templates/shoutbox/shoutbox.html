@@ -1,0 +1,7 @@
+{% load bbcode_tags %}
+{% for shout in shoutbox.shout_set.all|slice:num_entries %}
+<blockquote>
+    <p>{{ shout.body|bbcode }}</p>
+    <footer>{{ shout.created_by }}</footer>
+</blockquote>
+{% endfor %}
