@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bbcode_tags %}
+{% load forum_extras %}
 
 {% block content %}
 <h1>
@@ -10,17 +11,27 @@
     <a href="{{ board.get_absolute_url }}">{{ board.name }}</a> >
     {{ topic.get_latest_post.subject }}
 </h1>
-    <h2>{{ post.subject }}</h2>
+    {% pagination %}
+
     {% for post in object_list %}
     <hr/>
     <div class="row">
         <div class="col-md-2">
-            {{ post.created_by }}<br>
+            {% if post.created_by.avatar %}
+            <img class="avatar" src="{{ MEDIA_URL }}{{ post.created_by.avatar }}" alt="{{ post.created_by }}s Avatar"/><br/>
+            {% endif %}
+            {{ post.created_by }}<br/>
+
             <span class="text-muted">{{ post.created_at }}</span>
         </div>
         <div class="col-md-10">
             {{ post.body|bbcode|safe }}
+            {% for attachment in post.attachment_set.all %}
+            <img src="{{ MEDIA_URL }}{{ attachment.image }}" alt=""/>
+            {% endfor %}
         </div>
     </div>
     {% endfor %}
+
+    {% pagination %}
 {% endblock %}

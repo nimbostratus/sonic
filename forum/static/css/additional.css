@@ -1,3 +1,7 @@
+body {
+    padding-top: 50px;
+}
+
 span#tardis img{
     margin: 50px 0 20px 40px;
 }
@@ -10,3 +14,6 @@ td, th {
     border-top: none !important;
 }
 
+img.avatar {
+    border-radius: 3px;
+}

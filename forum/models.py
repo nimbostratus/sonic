@@ -74,3 +74,11 @@ class Post(models.Model):
 
     class Meta:
         ordering = 'created_at',
+
+
+class Attachment(models.Model):
+    image = models.ImageField(_('image'), upload_to='attachments/')
+    created_at = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Post)
+
+

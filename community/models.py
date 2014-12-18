@@ -7,6 +7,8 @@ GENDER_CHOICES = (
     ('m', _('male')),
     ('t', _('timelord'))
 )
+
+
 class Member(AbstractUser):
     last_activity = models.DateTimeField(_('last activity'), null=True, blank=True)
     personal_text = models.TextField(_('personal text'), null=True, blank=True)
