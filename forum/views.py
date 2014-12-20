@@ -7,6 +7,8 @@ class HomeView(ListView):
 
 
 class BoardView(ListView):
+    paginate_by = 20
+
     def get_queryset(self):
         return Board.objects.get(id=int(self.kwargs['id'])).topic_set.all()
 
