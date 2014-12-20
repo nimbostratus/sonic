@@ -12,7 +12,7 @@
 </h1>
 <span class="text-muted">{{ board.description }}</span><br/>
 {% for child in board.child_set.all %}
-<span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span> |
+<span class="small"><a href="{{ child.get_absolute_url }}">{{ child }}</a></span>{{ forloop.last|yesno:',<span class="text-muted"> |</span>'|safe }}
 {% endfor %}
 
 <table class="table">

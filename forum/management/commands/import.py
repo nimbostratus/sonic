@@ -9,6 +9,7 @@ from django.db.models import DateTimeField
 import os
 import subprocess
 import glob
+import pytz
 
 from community.models import Member
 from forum.models import Category, Topic, Board, Post, Attachment
@@ -27,6 +28,7 @@ class Importer(object):
     SOURCE_USER = 'root'
     SOURCE_PASSWORD = ''
     ATTACHMENT_TEMP = os.path.join(os.path.dirname(__file__), "attachment_temp")
+    TZ = pytz.timezone("Europe/Berlin")
 
     def _query(self, query):
         connection = mdb.connect(self.SOURCE_HOST, self.SOURCE_USER, self.SOURCE_PASSWORD, self.SOURCE_DB, charset="utf8")
@@ -36,6 +38,7 @@ class Importer(object):
         return rows
 
     def import_members(self):
+        print "* Importing members"
         rows = self._query("select * from smf_members")
 
         for row in rows:
@@ -49,8 +52,8 @@ class Importer(object):
             member = Member(
                 id=row['ID_MEMBER'],
                 username=row["memberName"],
-                date_joined=datetime.datetime.fromtimestamp(row['dateRegistered']),
-                last_activity=datetime.datetime.fromtimestamp(row['lastLogin']),
+                date_joined=self.TZ.localize(datetime.datetime.fromtimestamp(row['dateRegistered'])),
+                last_activity=self.TZ.localize(datetime.datetime.fromtimestamp(row['lastLogin'])),
                 first_name=row['realName'],
                 password=row['passwd'],
                 email=row['emailAddress'],
@@ -63,6 +66,7 @@ class Importer(object):
             member.save()
 
     def import_shoutboxes(self):
+        print "* Importing shoutboxes"
         rows = self._query("select * from smf_sp_shoutboxes")
 
         for row in rows:
@@ -72,6 +76,7 @@ class Importer(object):
             shoutbox.save()
 
     def import_shouts(self):
+        print "* Importing shouts"
         html_parser = HTMLParser.HTMLParser()
         rows = self._query("select * from smf_sp_shouts")
 
@@ -82,7 +87,7 @@ class Importer(object):
                     id=row['ID_SHOUT'],
                     shoutbox=ShoutBox.objects.get(id=row['ID_SHOUTBOX']),
                     created_by=member,
-                    created_at=datetime.datetime.fromtimestamp(row['log_time']),
+                    created_at=self.TZ.localize(datetime.datetime.fromtimestamp(row['log_time'])),
                     body=html_parser.unescape(row['body']).replace("<br />", "\n"))
 
                 disable_auto_now(shout)
@@ -91,6 +96,7 @@ class Importer(object):
                 pass
 
     def import_categories(self):
+        print "* Importing categories"
         rows = self._query("select * from smf_categories")
         for row in rows:
             category = Category(
@@ -101,6 +107,7 @@ class Importer(object):
             category.save()
 
     def import_boards(self):
+        print "* Importing boards"
         rows = self._query("select * from smf_boards order by ID_PARENT")
         for row in rows:
             category = Category.objects.get(id=row['ID_CAT'])
@@ -119,6 +126,7 @@ class Importer(object):
             board.save()
 
     def import_topics(self):
+        print "* Importing topics"
         rows = self._query("select * from smf_topics")
 
         for row in rows:
@@ -130,6 +138,7 @@ class Importer(object):
             topic.save()
 
     def import_posts(self):
+        print "* Importing posts"
         rows = self._query("select * from smf_messages")
         html_parser = HTMLParser.HTMLParser()
 
@@ -142,7 +151,7 @@ class Importer(object):
             post = Post(
                 id=row['ID_MSG'],
                 topic=Topic.objects.get(id=row['ID_TOPIC']),
-                created_at=datetime.datetime.fromtimestamp(row['posterTime']),
+                created_at=self.TZ.localize(datetime.datetime.fromtimestamp(row['posterTime'])),
                 created_by=member,
                 subject=html_parser.unescape(row['subject'].replace("Re:", "")),
                 body=html_parser.unescape(row['body']).replace("<br />", "\n"),
@@ -161,18 +170,20 @@ class Importer(object):
             ])
 
     def import_attachments(self):
+        print "* Importing attachments"
         rows = self._query("select * from smf_attachments")
         for row in rows:
             try:
                 fname = glob.glob(os.path.join(self.ATTACHMENT_TEMP, "%s_*" % row['ID_ATTACH']))[0]
                 if row['ID_MSG'] != 0:
-                    post = Post.objects.get(id=row['ID_MSG'])
-                    attachment = Attachment(
-                        post=post
-                    )
-                    with open(fname) as thefile:
-                        attachment.image.save(row['filename'], File(thefile))
-                    attachment.save()
+                    if row["ID_THUMB"] != 0:
+                        post = Post.objects.get(id=row['ID_MSG'])
+                        attachment = Attachment(
+                            post=post
+                        )
+                        with open(fname) as thefile:
+                            attachment.image.save(row['filename'], File(thefile))
+                        attachment.save()
                 elif row['ID_MEMBER'] != 0:
                     member = Member.objects.get(id=row['ID_MEMBER'])
                     with open(fname) as thefile:

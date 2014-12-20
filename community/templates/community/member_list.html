@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load bucket_extras %}
+
+{% block content %}
+    <div class="textcontent">
+        <h1>Mitglieder</h1>
+    </div>
+
+    <div class="textcontent">
+        {% if object_list %}
+            <table>
+                <thead>
+                <tr>
+                    <th><a href="{% url 'community_list' sorting="nick" %}">Username</a></th>
+                    <th><a href="{% url 'community_list' sorting="joined" %}">Angemeldet</a></th>
+                    <th><a href="{% url 'community_list' sorting="cash" %}">Bucks</a></th>
+                    <th><a href="{% url 'community_list' sorting="profile" %}">Profil</a></th>
+                    <th><a href="{% url 'community_list' sorting="buckets" %}">Buckets</a></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for member in object_list %}
+                    <tr>
+                        <td><a href="{{ member.get_absolute_url }}">{{ member.username|escape }}</a></td>
+                        <td>{{ member.date_joined|dayssince }}</td>
+                        <td>{{ member.cash }}</td>
+                        {% if member.about_me %}
+                            <td>mit Profil</td>
+                        {% else %}
+                            <td><!-- --></td>
+                        {% endif %}
+                        <td>{{ member.bucket_set.count }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            Niemand da...
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block subnav %}
+    <li><a href="/signup">Mitglied werden</a></li>
+    <li><a href="/login">Login</a></li>
+{% endblock %}

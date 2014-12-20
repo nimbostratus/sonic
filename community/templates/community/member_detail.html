@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load bucket_extras %}
+
+{% block content %}
+
+<div class="textcontent">
+    <h1>{{ member.username }}s Profil</h1>
+    <p>
+        {% fmb_markup member.about_me %}
+    </p>
+    <h2>Cash</h2>
+    <p>{{ member.username }} hat <b>{{ member.cash }}</b> Fun Metal Bucks</p>
+
+    <h2>Buckets</h2>
+    <ul>
+    {% for bucket in member.bucket_set.all %}
+      <li><a href="{{ bucket.get_absolute_url }}">{{ bucket|escape }}</a><small> ({{ bucket.created_at|dayssince }} {{ bucket.created_at|date:"H:i\h" }}, {{ bucket.comment_set.count }} Kommentare)</small></li>
+    {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Settings" %}{% endblock %}
+
+{% block content %}
+<div class="textcontent">
+    <h1>{% trans 'Settings' %}</h1>
+</div>
+
+<div id="postbucket">
+    <form action="{% url 'community_settings' %}" method="post">
+        <table width="50%">
+            {{ form }}
+            {% csrf_token %}
+            <tr><td></td><td><input type="submit" class="button" value="{% trans 'Save settings' %}"/></td></tr>
+        </table>
+    </form>
+</div>
+
+<div class="textcontent">
+    <h1>{% trans 'Actions' %}</h1>
+    <ul>
+        <li><a href="{% url 'community_change_password' %}">{% trans 'Change password' %}</a></li>
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+Hallo {{ member.username }},
+
+Jemand (vielleicht du) hat dich bei {{ base_url }} eingetragen.
+Wenn du auf der Funliste stehen willst, musst du den Aktivierungslink
+anklicken, um das Konto freizuschalten.
+
+Deine Mailadresse : {{ member.email }}
+Aktivierungs-Link : {{ base_url }}{% url 'community_activate' activation_hash_md5=member.activation_hash_md5 %}
+
+Wenn du dich *nicht* eingetragen hast ignorier diese Mail einfach - du wirst
+keine weitere Mail erhalten (es sei denn jemand trägt deine Adresse noch einmal
+in unsere Anmeldung ein).
+
+Viel Spaß
+  Der Fun Metal Bot

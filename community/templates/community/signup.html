@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Mitglied werden{% endblock %}
+
+{% block content %}
+
+
+<div id="postbucket">
+<h1>Mitglied werden</h1>
+    <form action="{% url 'community_signup' %}" method="post">
+        <table width="50%">
+            {% csrf_token %}
+            {{ form }}
+            <tr><td></td><td><input class="button" type="submit" value="Mitglied werden"/></td></tr>
+        </table>
+    </form>
+</div>
+
+{% endblock %}

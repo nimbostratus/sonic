@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block title %}{% trans 'Log in' %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'Log in' %}</h1>
+    <div class="well">
+    {% blocktrans %}
+        <b>Warning: </b> due to a very strange password hashing algorithm in the old smf
+        forum<a href="http://www.simplemachines.org/community/index.php?topic=413788.0">[1]</a> you need to reset your
+        password when logging in for the first time<br/><br/>
+    {% endblocktrans %}
+        <a class="btn btn-primary" href="{% url "community_reset_password" %}">{% trans "Reset Password" %}</a>
+    </div>
+    <form action="{% url 'community_login' %}" method="post">
+        <table class="table">
+            {% bootstrap_form form %}
+            {% csrf_token %}
+        </table>
+        <input class="btn btn-primary" type="submit" value="Anmelden"/>
+        <a class="btn btn-default" href="{% url 'community_signup' %}">{% trans 'No account?' %}</a>
+        <a class="btn btn-default" href="{% url 'community_reset_password' %}">{% trans 'Lost password?' %}</a>
+    </form>
+{% endblock %}
+
