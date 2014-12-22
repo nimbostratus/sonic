@@ -1,19 +1,16 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}Mitglied werden{% endblock %}
 
 {% block content %}
-
-
-<div id="postbucket">
 <h1>Mitglied werden</h1>
-    <form action="{% url 'community_signup' %}" method="post">
-        <table width="50%">
-            {% csrf_token %}
-            {{ form }}
-            <tr><td></td><td><input class="button" type="submit" value="Mitglied werden"/></td></tr>
-        </table>
-    </form>
-</div>
+<form action="{% url 'community_signup' %}" method="post">
+    <table width="50%">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+    </table>
+    <input class="btn btn-primary" type="submit" value="Mitglied werden"/>
+</form>
 
 {% endblock %}

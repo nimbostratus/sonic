@@ -44,12 +44,14 @@
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         {% if user.is_authenticated %}
-                            <li><a href="#">Logout</a></li>
+                            <li><a href="{% url 'community_logout' %}">Logout</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'community_change_password' %}">Change Password</a></li>
                         {% else %}
                             <li><a href="{% url "community_login" %}">Login</a></li>
                             <li class="divider"></li>
-                            <li><a href="#">Reset Password</a></li>
-                            <li><a href="#">Register</a></li>
+                            <li><a href="{% url 'community_reset_password' %}">Reset Password</a></li>
+                            <li><a href="{% url 'community_signup' %}">Register</a></li>
                         {% endif %}
                     </ul>
                 </li>

@@ -20,3 +20,4 @@ class Member(AbstractUser):
     steam_id = models.CharField(_('steam id'), max_length=20, null=True, blank=True)
     signature = models.TextField(_('signature'), null=True, blank=True)
     avatar = models.ImageField(_('avatar'), upload_to='avatars', blank=True, null=True)
+    activation_hash_md5 = models.CharField(_('activation hash'), max_length=32, blank=True, null=True)

@@ -6,6 +6,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
+BASE_URL = 'http://www.timelord.de'
 AUTH_USER_MODEL = "community.Member"
 SECRET_KEY = '&9ohy_$of=u!cmw81&=tvi9iy)prq-i^qd_$m_*ih$97_a_9=e'
 
@@ -68,3 +69,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'site_media')
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

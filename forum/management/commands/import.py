@@ -55,7 +55,7 @@ class Importer(object):
                 date_joined=self.TZ.localize(datetime.datetime.fromtimestamp(row['dateRegistered'])),
                 last_activity=self.TZ.localize(datetime.datetime.fromtimestamp(row['lastLogin'])),
                 first_name=row['realName'],
-                password=row['passwd'],
+                password=u'sha1$$'+row['passwd'],
                 email=row['emailAddress'],
                 gender=gender,
                 birth_date=row['birthdate'],
